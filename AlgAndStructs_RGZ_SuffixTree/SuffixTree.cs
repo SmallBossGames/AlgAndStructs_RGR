@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -47,7 +46,12 @@ namespace AlgAndStructs_RGZ_SuffixTree
                 }
                 else
                 {
-                    var tail = _tempAddEdge.Subdivide(_tempAddIndex + 1);
+                    //var tail = _tempAddEdge.Subdivide(_tempAddIndex + 1);
+
+                    if(_tempAddDeep == 1)
+                    {
+                        SplitTreeRoot(_tempAddEdge, _tempAddIndex, _string, charIndex);
+                    }
 
                     ResetAddTemp();
                     //TODO: Add split logic
@@ -91,6 +95,36 @@ namespace AlgAndStructs_RGZ_SuffixTree
             _tempAddEdge = _root;
         }
 
+        private void SplitTreeRoot(SuffixTreeEdge edge, int position, IList<char> charset, int currentCharIndex)
+        {
+            SuffixTreeEdge tail = null;
+            SuffixTreeEdge tempEdge = null;
+
+            foreach (var item in _root.Children)
+            {
+                var newPos = position - (item.Span.From - edge.Span.From); 
+                if(newPos > 0)
+                {
+                    var newEdge = new SuffixTreeEdge()
+                    {
+                        Span = new SuffixTreeSpan(charset, currentCharIndex, null),
+                    };
+
+                    var newTail = item.Subdivide(newPos);
+                    item.Children.Add(newEdge);
+
+                    if (tail!= null)
+                    {
+                        tail.SuffixLink = newTail;
+                        tempEdge.SuffixLink = newEdge;
+                    }
+
+                    tempEdge = newEdge;
+                    tail = newTail;
+                }
+            }
+        }
+
         private void AddEdgeToRootEdges(SuffixTreeEdge edge)
         {
             for (int i = 0; i < _root.Children.Count; i++)
@@ -105,63 +139,6 @@ namespace AlgAndStructs_RGZ_SuffixTree
         }
     }
 
-    struct SuffixTreeSpan:IEnumerable<char>
-    {
-        private readonly IList<char> _charset;
-        private readonly int? _to;
-
-        public int Length => To - From;
-
-        public int From { get; }
-
-        public int To => _to == null ? _charset.Count : _to.Value;
-
-        public SuffixTreeSpan(IList<char> charset, int fromIndex, int? toIndex)
-        {
-            _charset = charset;
-            From = fromIndex;
-            _to = toIndex;
-        }
-
-        public char this[int index]
-        {
-            get
-            {
-                if(index < 0 || index >= Length)
-                {
-                    throw new IndexOutOfRangeException();
-                }
-                return _charset[From + index];
-            }
-        }
-
-        public (SuffixTreeSpan head, SuffixTreeSpan tail) Split(int position)
-        {
-            if (position < 0 || position >= Length)
-            {
-                throw new IndexOutOfRangeException();
-            }
-
-            var head = new SuffixTreeSpan(_charset, From, position);
-            var tail = new SuffixTreeSpan(_charset, position, _to);
-
-            return (head, tail);
-        }
-
-        public IEnumerator<char> GetEnumerator()
-        {
-            for (int i = From; i < To; i++)
-            {
-                yield return _charset[i];
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-    }
-
     class SuffixTreeEdge
     {
         public SuffixTreeEdge()
@@ -171,6 +148,7 @@ namespace AlgAndStructs_RGZ_SuffixTree
 
         internal SuffixTreeSpan Span { get; set; }
         internal List<SuffixTreeEdge> Children { get; set; }
+        internal SuffixTreeEdge SuffixLink { get; set; }
 
         public SuffixTreeEdge Subdivide(int position)
         {
