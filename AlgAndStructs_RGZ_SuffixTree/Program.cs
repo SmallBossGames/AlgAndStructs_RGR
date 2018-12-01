@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -14,9 +15,24 @@ namespace AlgAndStructs_RGZ_SuffixTree
         [STAThread]
         static void Main()
         {
+            var testString = "Дон ли, Волга ли течёт,";
             SuffixTree tree = new SuffixTree();
 
-            tree.AddRange("abcabde");
+            tree.AddRange(testString);
+
+            var sb = new StringBuilder();
+
+            foreach (var item in testString)
+            {
+                sb.Append(item);
+
+                var res = tree.IsSuffixExist(sb.ToString());
+
+                if (res != true)
+                    throw new Exception();
+            }
+
+            
 
             SuffixTreeSpan span = new SuffixTreeSpan("пидорас".ToCharArray(), 0, null);
 

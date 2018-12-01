@@ -19,6 +19,8 @@ namespace AlgAndStructs_RGZ_SuffixTree
 
         public int To => _to == null ? _charset.Count : _to.Value;
 
+        public static SuffixTreeSpan Zero => new SuffixTreeSpan(null, 0, 0);
+
         public SuffixTreeSpan(IList<char> charset, int fromIndex, int? toIndex)
         {
             _charset = charset;
@@ -40,13 +42,17 @@ namespace AlgAndStructs_RGZ_SuffixTree
 
         public (SuffixTreeSpan head, SuffixTreeSpan tail) Split(int position)
         {
-            if (position < 0 || position >= Length)
+            if (position < 1 || position > Length)
             {
                 throw new IndexOutOfRangeException();
             }
+            else if (position == 0)
+            {
+                return (Zero, this);
+            }
 
-            var head = new SuffixTreeSpan(_charset, From, From + position+1);
-            var tail = new SuffixTreeSpan(_charset, From + position+1, _to);
+            var head = new SuffixTreeSpan(_charset, From, From + position);
+            var tail = new SuffixTreeSpan(_charset, From + position, _to);
 
             return (head, tail);
         }

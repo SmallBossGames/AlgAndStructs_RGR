@@ -25,7 +25,7 @@ namespace AlgAndStructs_RGZ_SuffixTree
         {
             _root = new SuffixTreeEdge()
             {
-                Span = new SuffixTreeSpan(null, 0, 0)
+                Span = SuffixTreeSpan.Zero
             };
             _string = new List<char>(16);
 
@@ -37,7 +37,7 @@ namespace AlgAndStructs_RGZ_SuffixTree
             var charIndex = _string.Count;
             _string.Add(character);
 
-            if(_tempAddIndex < _tempAddEdge.Span.Length)
+            if(_tempAddIndex+1 < _tempAddEdge.Span.Length)
             {
                 _tempAddIndex++;
                 if (_tempAddEdge.Span[_tempAddIndex] == character)
@@ -51,6 +51,10 @@ namespace AlgAndStructs_RGZ_SuffixTree
                     if(_tempAddDeep == 1)
                     {
                         SplitTreeRoot(_tempAddEdge, _tempAddIndex, _string, charIndex);
+                    }
+                    else
+                    {
+                        SplitTreeSuffixLink(_tempAddEdge, _tempAddIndex, _string, charIndex);
                     }
 
                     ResetAddTemp();
@@ -88,6 +92,8 @@ namespace AlgAndStructs_RGZ_SuffixTree
             }
         }
 
+        public bool IsSuffixExist(string str) => SlowScan(_root, str);
+
         private void ResetAddTemp()
         {
             _tempAddIndex = 0;
@@ -97,45 +103,133 @@ namespace AlgAndStructs_RGZ_SuffixTree
 
         private void SplitTreeRoot(SuffixTreeEdge edge, int position, IList<char> charset, int currentCharIndex)
         {
-            SuffixTreeEdge tail = null;
-            SuffixTreeEdge tempEdge = null;
+            SuffixTreeEdge tempcontinueEdge = null;
+            SuffixTreeEdge tempNewEdge = null;
 
-            foreach (var item in _root.Children)
+            for (int i = 0; i < _root.Children.Count; i++)
             {
-                var newPos = position - (item.Span.From - edge.Span.From); 
-                if(newPos > 0)
+                var item = _root.Children[i];
+                var newPos = position - (item.Span.From - edge.Span.From);
+
+                if (newPos > 0)
                 {
                     var newEdge = new SuffixTreeEdge()
                     {
                         Span = new SuffixTreeSpan(charset, currentCharIndex, null),
                     };
 
-                    var newTail = item.Subdivide(newPos);
-                    item.Children.Add(newEdge);
+                    (item, newPos) = FastScan(item, edge.Span, newPos);
 
-                    if (tail!= null)
+                    if(newPos+1 != item.Span.Length)
                     {
-                        tail.SuffixLink = newTail;
-                        tempEdge.SuffixLink = newEdge;
+                        var continueEdge = item.Subdivide(newPos + 1);
+
+                        if (tempcontinueEdge != null)
+                        {
+                            tempcontinueEdge.SuffixLink = continueEdge;
+                        }
+
+                        tempcontinueEdge = continueEdge;
                     }
 
-                    tempEdge = newEdge;
-                    tail = newTail;
+                    item.Children.Add(newEdge);
+
+                    if (tempNewEdge != null)
+                    {
+                        tempNewEdge.SuffixLink = newEdge;
+                    }
+
+                    tempNewEdge = newEdge;
                 }
             }
         }
 
-        private void AddEdgeToRootEdges(SuffixTreeEdge edge)
+        private void SplitTreeSuffixLink(SuffixTreeEdge edge, int position, IList<char> charset, int currentCharIndex)
         {
-            for (int i = 0; i < _root.Children.Count; i++)
-            {
-                SuffixTreeEdge child = _root.Children[i];
+            SuffixTreeEdge tempcontinueEdge = null;
+            SuffixTreeEdge tempNewEdge = null;
 
-                if (child.Span.From > edge.Span.From)
+            while (edge!=null)
+            {
+                var newEdge = new SuffixTreeEdge()
                 {
-                    child.Children.Add(edge);
+                    Span = new SuffixTreeSpan(charset, currentCharIndex, null),
+                };
+
+                var (item, newPos) = FastScan(edge, edge.Span, position);
+
+                if (newPos + 1 != item.Span.Length)
+                {
+                    var continueEdge = item.Subdivide(newPos + 1);
+
+                    if (tempcontinueEdge != null)
+                    {
+                        tempcontinueEdge.SuffixLink = continueEdge;
+                    }
+
+                    tempcontinueEdge = continueEdge;
                 }
+
+                item.Children.Add(newEdge);
+
+                if (tempNewEdge != null)
+                {
+                    tempNewEdge.SuffixLink = newEdge;
+                }
+
+                tempNewEdge = newEdge;
+
+
+                edge = edge.SuffixLink;
             }
+        }
+
+        private (SuffixTreeEdge edge, int position) FastScan(SuffixTreeEdge startEdge, SuffixTreeSpan span, int offset)
+        {
+            while (offset >= startEdge.Span.To)
+            {
+                foreach (var item in startEdge.Children)
+                {
+                    if(item.Span[0] == span[startEdge.Span.To-1])
+                    {
+                        offset -= startEdge.Span.To;
+                        startEdge = item;
+                        break;
+                    }
+                }
+               // throw new ArgumentException("Символ не найден");
+            }
+            return (startEdge, offset);
+        }
+
+        private bool SlowScan(SuffixTreeEdge startEdge, string str)
+        {
+            var spanIndex = 0;
+
+            for (int i = 0; i < str.Length; i++)
+            {
+                if (spanIndex + 1 >= startEdge.Span.Length)
+                {
+                    foreach (var item in startEdge.Children)
+                    {
+                        if (item.Span[0] == str[i])
+                        {
+                            startEdge = item;
+                            spanIndex = 0;
+                            break;
+                        }
+                    }
+                }
+
+                if (startEdge.Span[spanIndex] != str[i])
+                {
+                    return false;
+                }
+
+                spanIndex++;
+            }
+
+            return true;
         }
     }
 
