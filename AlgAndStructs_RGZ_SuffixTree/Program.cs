@@ -15,24 +15,19 @@ namespace AlgAndStructs_RGZ_SuffixTree
         [STAThread]
         static void Main()
         {
-            var testString = "abcabxabcd";
+            var testString = "abcabxabcd\0";
             SuffixTree tree = new SuffixTree();
 
             tree.AddRange(testString);
 
-            /*var sb = new StringBuilder();
-
-            foreach (var item in testString)
+           /* foreach (var item in testString)
             {
-                sb.Append(item);
 
                 var res = tree.IsSuffixExist(sb.ToString());
 
                 if (res != true)
                     throw new Exception();
-            }
-            */
-
+            }*/
             
 
             SuffixTreeSpan span = new SuffixTreeSpan("пидорас".ToCharArray(), 0, null);

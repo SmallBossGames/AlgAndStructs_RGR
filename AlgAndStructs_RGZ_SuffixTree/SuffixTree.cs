@@ -42,6 +42,7 @@ namespace AlgAndStructs_RGZ_SuffixTree
         public void Add(char character)
         {
             var currentCharIndex = _string.Count;
+            //var tempCharIndex = currentCharIndex;
             SuffixTreeEdge tempEdge = null;
 
             if (remainder == 0)
@@ -60,6 +61,7 @@ namespace AlgAndStructs_RGZ_SuffixTree
                     if (item.Span[0] == activePoint.startChar)
                     {
                         currentEdge = item;
+                        break;
                     }
                 }
 
@@ -81,6 +83,7 @@ namespace AlgAndStructs_RGZ_SuffixTree
                 if (activePoint.length == currentEdge.Span.Length)
                 {
                     activePoint = (currentEdge, character, 0);
+                    continue;
                 }
 
                 if (currentEdge.Span[activePoint.length] == character)
@@ -89,6 +92,8 @@ namespace AlgAndStructs_RGZ_SuffixTree
                     remainder++;
                     return;
                 }
+
+
 
                 var tail = currentEdge.Subdivide(activePoint.length);
 
@@ -101,12 +106,25 @@ namespace AlgAndStructs_RGZ_SuffixTree
 
                 if(tempEdge != null)
                 {
-                    tempEdge.SuffixLink = activePoint.edge;
-                    tempEdge = activePoint.edge;
+                    //Правило 2
+                    tempEdge.SuffixLink = currentEdge;
                 }
 
-                activePoint.edge = activePoint.edge.SuffixLink ?? _root;
-                //activePoint.startChar = 
+                tempEdge = currentEdge;
+
+                
+                if (activePoint.edge == _root)
+                {
+                    //Правило 1
+                    activePoint.length--;
+                    activePoint.startChar = _string[currentCharIndex - activePoint.length];
+                }
+                else
+                {
+                    //Правило 3
+                    activePoint.edge = activePoint.edge.SuffixLink ?? _root;
+                }
+
                 remainder--;
             }
         }
