@@ -15,12 +15,12 @@ namespace AlgAndStructs_RGZ_SuffixTree
         [STAThread]
         static void Main()
         {
-            var testString = "Дон ли, Волга ли течёт,";
+            var testString = "abcabxabcd";
             SuffixTree tree = new SuffixTree();
 
             tree.AddRange(testString);
 
-            var sb = new StringBuilder();
+            /*var sb = new StringBuilder();
 
             foreach (var item in testString)
             {
@@ -31,6 +31,7 @@ namespace AlgAndStructs_RGZ_SuffixTree
                 if (res != true)
                     throw new Exception();
             }
+            */
 
             
 

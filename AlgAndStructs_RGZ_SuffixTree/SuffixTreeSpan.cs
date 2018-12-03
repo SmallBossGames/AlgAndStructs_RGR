@@ -46,10 +46,6 @@ namespace AlgAndStructs_RGZ_SuffixTree
             {
                 throw new IndexOutOfRangeException();
             }
-            else if (position == 0)
-            {
-                return (Zero, this);
-            }
 
             var head = new SuffixTreeSpan(_charset, From, From + position);
             var tail = new SuffixTreeSpan(_charset, From + position, _to);
