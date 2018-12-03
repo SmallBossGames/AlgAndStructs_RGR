@@ -55,6 +55,10 @@ namespace AlgAndStructs_RGZ_SuffixTree
 
             while (remainder > 0)
             {
+                if(character == ' ')
+                {
+                    var a = 0;
+                }
                 SuffixTreeEdge currentEdge = null;
                 foreach (var item in activePoint.edge.Children)
                 {
@@ -65,24 +69,39 @@ namespace AlgAndStructs_RGZ_SuffixTree
                     }
                 }
 
-                if(currentEdge == null)
+
+                if (currentEdge == null)
                 {
+                    if(activePoint.length!=0)
+                    {
+                        throw new Exception();
+                    }
+
                     activePoint.edge.Children.Add(new SuffixTreeEdge()
                     {
                         Span = new SuffixTreeSpan(_string, currentCharIndex, null)
                     });
 
-                    activePoint.startChar = character;
-                    activePoint.length--;
+                    if (activePoint.edge == _root)
+                    {
+                        activePoint.startChar = _string[currentCharIndex - activePoint.length];
+                        activePoint.length--;
+                    }
+                    else
+                    {
+                        activePoint.edge = activePoint.edge.SuffixLink ?? _root;
+                    }
 
                     remainder--;
 
                     continue;
                 }
 
-                if (activePoint.length == currentEdge.Span.Length)
+                if (activePoint.length >= currentEdge.Span.Length)
                 {
-                    activePoint = (currentEdge, character, 0);
+                    var deltaLength = activePoint.length - currentEdge.Span.Length;
+                    var newCharIndex = currentCharIndex - deltaLength;
+                    activePoint = (currentEdge, _string[newCharIndex], deltaLength);
                     continue;
                 }
 

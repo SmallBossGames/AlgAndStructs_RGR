@@ -15,7 +15,8 @@ namespace AlgAndStructs_RGZ_SuffixTree
         [STAThread]
         static void Main()
         {
-            var testString = "abcabxabcd\0";
+            var testString = @"Дон ли, Волга ли течет";
+
             SuffixTree tree = new SuffixTree();
 
             tree.AddRange(testString);
