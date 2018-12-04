@@ -42,7 +42,7 @@ namespace AlgAndStructs_RGZ_SuffixTree
 
         public (SuffixTreeSpan head, SuffixTreeSpan tail) Split(int position)
         {
-            if (position < 1 || position > Length)
+            if (position < 1 || position >= Length)
             {
                 throw new IndexOutOfRangeException();
             }
