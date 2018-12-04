@@ -164,11 +164,107 @@ namespace AlgAndStructs_RGZ_SuffixTree
             }
         }
 
+        public void NewAdd(char character)
+        {
+            if(remainder == 0)
+            {
+                startPoint = (_root, character, 0);
+            }
+
+            var currentCharIndex = _string.Count;
+            _string.Add(character);
+            SuffixTreeEdge tempSuffixLink = null;
+            remainder++;
+
+            while (remainder>0)
+            {
+                SuffixTreeEdge currentEdge = null;
+                foreach (var item in startPoint.edge.Children)
+                {
+                    if(item.Span[0] == startPoint.startChar)
+                    {
+                        currentEdge = item;
+                        break;
+                    }
+                }
+
+                if(currentEdge == null)
+                {
+                    var addedEdge = new SuffixTreeEdge()
+                    {
+                        Span = new SuffixTreeSpan(_string, currentCharIndex, null),
+                    };
+
+                    startPoint.edge.Children.Add(addedEdge);
+
+                    remainder--;
+
+                    continue;
+                }
+
+                if(startPoint.length >= currentEdge.Span.Length)
+                {
+                    startPoint.length -= currentEdge.Span.Length;
+                    startPoint.startChar = _string[currentCharIndex - startPoint.length];
+                    startPoint.edge = currentEdge;
+
+                    continue;
+                }
+
+                if(currentEdge.Span[startPoint.length] == character)
+                {
+                    startPoint.length++;
+                    return;
+                }
+
+                //Если ничего из предыдущего не вышло - делаем подразделение
+                var tail = new SuffixTreeSpan(_string, startPoint.length + currentEdge.Span.From, null);
+                var head = new SuffixTreeSpan(_string, currentEdge.Span.From, startPoint.length + currentEdge.Span.From);
+                var newSpan = new SuffixTreeSpan(_string, currentCharIndex, null);
+
+                var tailEdge = new SuffixTreeEdge()
+                {
+                    Children = currentEdge.Children,
+                    Span = tail,
+                };
+
+                var newEdge = new SuffixTreeEdge()
+                {
+                    Span = newSpan,
+                };
+
+                currentEdge.Span = head;
+                currentEdge.Children = new List<SuffixTreeEdge>(2)
+                {
+                    tailEdge,
+                    newEdge
+                };
+
+                if (tempSuffixLink!=null)
+                {
+                    tempSuffixLink.SuffixLink = currentEdge;
+                }
+                tempSuffixLink = currentEdge;
+
+                if(startPoint.edge == _root)
+                {
+                    startPoint.length--;
+                    startPoint.startChar = _string[currentCharIndex - startPoint.length];
+                }
+                else
+                {
+                    startPoint.edge = startPoint.edge.SuffixLink ?? _root;
+                }
+
+                remainder--;
+            }
+        }
+
         public void AddRange(IEnumerable<char> characters)
         {
             foreach (var item in characters)
             {
-                Add(item);
+                NewAdd(item);
             }
         }
 
