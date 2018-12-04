@@ -16,7 +16,7 @@ namespace AlgAndStructs_RGZ_SuffixTree
         static void Main()
         {
             var testString =
-                @"abcabxabcdaby";
+                @"abcabxabcdabyabcdabk";
 
             var arr = testString.ToCharArray();
 

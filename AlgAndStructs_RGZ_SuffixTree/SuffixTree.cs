@@ -179,11 +179,15 @@ namespace AlgAndStructs_RGZ_SuffixTree
             while (remainder>0)
             {
                 SuffixTreeEdge currentEdge = null;
-                foreach (var item in startPoint.edge.Children)
+                var currentEdgeIndex = 0;
+
+                for (int i = 0; i < startPoint.edge.Children.Count; i++)
                 {
-                    if(item.Span[0] == startPoint.startChar)
+                    SuffixTreeEdge item = startPoint.edge.Children[i];
+                    if (item.Span[0] == startPoint.startChar)
                     {
                         currentEdge = item;
+                        currentEdgeIndex = i;
                         break;
                     }
                 }
@@ -196,6 +200,11 @@ namespace AlgAndStructs_RGZ_SuffixTree
                     };
 
                     startPoint.edge.Children.Add(addedEdge);
+                    
+                    if (startPoint.edge != _root)
+                    {
+                        startPoint.edge = startPoint.edge.SuffixLink ?? _root;
+                    }
 
                     remainder--;
 
