@@ -26,7 +26,6 @@ namespace AlgAndStructs_RGZ_SuffixTree
     {
         public SimpleSuffixTreeEdge()
         {
-            Children = new List<SimpleSuffixTreeEdge>();
         }
 
         internal int From { get; set; }
