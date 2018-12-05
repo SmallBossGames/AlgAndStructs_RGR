@@ -11,7 +11,7 @@ namespace AlgAndStructs_RGZ_SuffixTree
     struct SuffixTreeSpan :IEnumerable<char>
     {
         private readonly IList<char> _charset;
-        private readonly int? _to;
+        public readonly int? _to;
 
         public int Length => To - From;
 

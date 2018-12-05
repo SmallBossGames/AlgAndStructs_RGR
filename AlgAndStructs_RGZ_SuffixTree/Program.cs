@@ -16,7 +16,12 @@ namespace AlgAndStructs_RGZ_SuffixTree
         static void Main()
         {
             var testString =
-                @"abcabxabcdabyabcdabk";
+                @"Дон ли, Волга ли течёт, котомку на плечо
+Боль в груди — там тайничок, открытый фомкой, не ключом
+Сколько миль еще, перелет короткий был не в счет
+Долгий пыльный чёс, фургон набит коробками с мерчём
+Верим — подфартит, наши постели портативны
+Менестре$";
 
             var arr = testString.ToCharArray();
 

@@ -203,6 +203,12 @@ namespace AlgAndStructs_RGZ_SuffixTree
                     
                     if (startPoint.edge != _root)
                     {
+                        if (tempSuffixLink != null)
+                        {
+                            tempSuffixLink.SuffixLink = startPoint.edge;
+                        }
+                        tempSuffixLink = startPoint.edge;
+
                         startPoint.edge = startPoint.edge.SuffixLink ?? _root;
                     }
 
@@ -227,33 +233,34 @@ namespace AlgAndStructs_RGZ_SuffixTree
                 }
 
                 //Если ничего из предыдущего не вышло - делаем подразделение
-                var tail = new SuffixTreeSpan(_string, startPoint.length + currentEdge.Span.From, null);
+                var tail = new SuffixTreeSpan(_string, startPoint.length + currentEdge.Span.From, currentEdge.Span._to);
                 var head = new SuffixTreeSpan(_string, currentEdge.Span.From, startPoint.length + currentEdge.Span.From);
                 var newSpan = new SuffixTreeSpan(_string, currentCharIndex, null);
 
-                var tailEdge = new SuffixTreeEdge()
-                {
-                    Children = currentEdge.Children,
-                    Span = tail,
-                };
-
                 var newEdge = new SuffixTreeEdge()
                 {
-                    Span = newSpan,
+                    Span = newSpan
                 };
 
-                currentEdge.Span = head;
-                currentEdge.Children = new List<SuffixTreeEdge>(2)
+                currentEdge.Span = tail;
+
+                var headEdge = new SuffixTreeEdge()
                 {
-                    tailEdge,
-                    newEdge
+                    Children = new List<SuffixTreeEdge>()
+                    {
+                        currentEdge,
+                        newEdge
+                    },
+                    Span = head
                 };
 
-                if (tempSuffixLink!=null)
+                startPoint.edge.Children[currentEdgeIndex] = headEdge;
+
+                if(tempSuffixLink != null)
                 {
-                    tempSuffixLink.SuffixLink = currentEdge;
+                    tempSuffixLink.SuffixLink = headEdge;
                 }
-                tempSuffixLink = currentEdge;
+                tempSuffixLink = headEdge;
 
                 if(startPoint.edge == _root)
                 {
@@ -263,6 +270,10 @@ namespace AlgAndStructs_RGZ_SuffixTree
                 else
                 {
                     startPoint.edge = startPoint.edge.SuffixLink ?? _root;
+                    if(startPoint.edge.SuffixLink == _root)
+                    {
+                        throw new Exception();
+                    }
                 }
 
                 remainder--;
