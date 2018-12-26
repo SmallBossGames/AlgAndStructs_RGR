@@ -27,27 +27,21 @@ namespace AlgAndStructs_RGZ_SuffixTree
             var blockLength = 500;
             var counter = 0;
             var i = 0;
-            var fullTime = 0.0;
+            var fullTime = 0L;
             _suffixTree = new SuffixTree();
             foreach (var item in richTextBox1.Text)
             {
                 sw.Start();
                 _suffixTree.NewAdd(item);
                 sw.Stop();
-
-                if (counter > blockLength)
-                {
-                    var value = sw.ElapsedTicks / blockLength;
-                    chart1.Series[0].Points.AddXY(i * blockLength, value);
-                    fullTime += sw.ElapsedMilliseconds;
-                    sw.Reset();
-                    counter = 0;
-                    i++;
-                }
+                chart1.Series[0].Points.Add(sw.ElapsedTicks);
+                fullTime += sw.ElapsedTicks;
+                sw.Reset();
 
                 counter++;
             }
             textBox2.Text = fullTime.ToString();
+            memUsetextBox.Text = _suffixTree.GetTreeSize().ToString();
         }
 
         private void check_Click(object sender, EventArgs e)

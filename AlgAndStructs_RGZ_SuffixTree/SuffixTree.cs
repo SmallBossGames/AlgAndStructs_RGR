@@ -140,10 +140,6 @@ namespace AlgAndStructs_RGZ_SuffixTree
                 else
                 {
                     startPoint.edge = startPoint.edge.SuffixLink ?? _root;
-                    if(startPoint.edge.SuffixLink == _root)
-                    {
-                        throw new Exception();
-                    }
                 }
 
                 remainder--;
@@ -192,6 +188,25 @@ namespace AlgAndStructs_RGZ_SuffixTree
                 localPosition++;
             }
             return true;
+        }
+
+        public int GetTreeSize()
+        {
+            var sum = _string.Count * sizeof(char);
+            //Размер = from, to, str_ptr, children_ptrs, suffix_link_ptr
+            var childrenCount = GetEdgeCount(_root);
+            sum += (childrenCount + 1) * (sizeof(int) * 2 + sizeof(Int64)*2) + childrenCount*sizeof(Int64);
+            return sum;
+        }
+
+        private int GetEdgeCount(SuffixTreeEdge root)
+        {
+            var sum = root.Children.Count;
+            foreach (var item in root.Children)
+            {
+                sum += GetEdgeCount(item);
+            }
+            return sum;
         }
     }
 
